@@ -1,0 +1,40 @@
+name: Build Windows
+
+on:
+  push:
+    branches:
+      - release/windows-port-v1.0.0
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: release/windows-port-v1.0.0
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        working-directory: VibeProxyWindows
+        run: dotnet restore VibeProxy.sln
+
+      - name: Build
+        working-directory: VibeProxyWindows
+        run: dotnet build VibeProxy.sln --configuration Release --no-restore
+
+      - name: Publish (self-contained .exe)
+        working-directory: VibeProxyWindows
+        run: dotnet publish VibeProxy/VibeProxy.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VibeProxy-Windows
+          path: VibeProxyWindows/publish/
