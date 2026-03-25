@@ -1,9 +1,6 @@
 name: Build Windows
 
 on:
-  push:
-    branches:
-      - release/windows-port-v1.0.0
   workflow_dispatch:
 
 jobs:
@@ -11,9 +8,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout PR branch
+      - name: Checkout PR branch from dautedr fork
         uses: actions/checkout@v4
         with:
+          repository: dautedr/vibeproxy
           ref: release/windows-port-v1.0.0
 
       - name: Setup .NET 8
